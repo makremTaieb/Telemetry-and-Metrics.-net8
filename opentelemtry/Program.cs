@@ -7,6 +7,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(opt =>
+    {
+        opt.AddMeter(
+            "Microsoft.AspNetCore.Hosting",
+            "Microsoft.AspNetCore.Server.Kestrel");
+    });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
