@@ -17,20 +17,37 @@ builder.Services.AddOpenTelemetry()
     .ConfigureResource(res => res.AddService("ClientService"))
     .WithMetrics(m =>
     {
-        m.AddAspNetCoreInstrumentation();
-        m.AddHttpClientInstrumentation();
+        m.AddAspNetCoreInstrumentation()
+         .AddHttpClientInstrumentation();
+
+        m.AddOtlpExporter(opt =>
+        {
+            opt.Endpoint = new Uri("Http://localhost:18889");
+        });
     })
     .WithTracing(t =>
     {
-        t.AddAspNetCoreInstrumentation();
-        t.AddHttpClientInstrumentation();
-        t.AddEntityFrameworkCoreInstrumentation();
+        t.AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddEntityFrameworkCoreInstrumentation();
+
+
+        t.AddOtlpExporter(opt =>
+        {
+            opt.Endpoint = new Uri("Http://localhost:18889");
+        });
     });
 
 builder.Logging.AddOpenTelemetry(opt =>
 {
     opt.AddConsoleExporter()
        .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("ClientService"));
+
+
+    opt.AddOtlpExporter(x =>
+    {
+        x.Endpoint = new Uri("Http://localhost:18889");
+    });
 });
 
 var app = builder.Build();
