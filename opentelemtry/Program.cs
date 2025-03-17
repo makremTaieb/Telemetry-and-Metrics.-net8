@@ -1,3 +1,8 @@
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -9,12 +14,24 @@ builder.Services.AddSwaggerGen();
 
 
 builder.Services.AddOpenTelemetry()
-    .WithMetrics(opt =>
+    .ConfigureResource(res => res.AddService("ClientService"))
+    .WithMetrics(m =>
     {
-        opt.AddMeter(
-            "Microsoft.AspNetCore.Hosting",
-            "Microsoft.AspNetCore.Server.Kestrel");
+        m.AddAspNetCoreInstrumentation();
+        m.AddHttpClientInstrumentation();
+    })
+    .WithTracing(t =>
+    {
+        t.AddAspNetCoreInstrumentation();
+        t.AddHttpClientInstrumentation();
+        t.AddEntityFrameworkCoreInstrumentation();
     });
+
+builder.Logging.AddOpenTelemetry(opt =>
+{
+    opt.AddConsoleExporter()
+       .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("ClientService"));
+});
 
 var app = builder.Build();
 
