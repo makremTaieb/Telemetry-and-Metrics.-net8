@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  # opentelemtry:
+  #   image: ${DOCKER_REGISTRY-}opentelemtry
+  #   build:
+  #     context: .
+  #     dockerfile: opentelemtry/Dockerfile
