@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using RestSharp;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -34,8 +36,21 @@ namespace opentelemtry.Controllers
                 _logger.LogWarning($"invalid Client model {ModelState.Count} {id} ", id);
                 return BadRequest();
             }
-            _logger.LogInformation("return Client id {id}", id);
+            var options = new RestClientOptions("https://localhost:7101/")
+            {
+             
+            };
+            var client = new RestClient(options);
+            var request = new RestRequest("api/client", Method.Get);
+            
 
+            var response = await client.ExecuteAsync(request);
+
+            if (response.IsSuccessful)
+            {
+
+                _logger.LogInformation("return Client id {id}", id);
+            }
             return Ok($"Client : {id}");
         }
 
